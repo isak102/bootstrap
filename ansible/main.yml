@@ -1,0 +1,40 @@
+---
+- name: Install ssh key
+  hosts: localhost
+
+  vars_files:
+    - ./vars/secret.yml
+
+  vars:
+    ssh_dir: "{{ ansible_user_dir }}/.ssh"
+    dotfiles_dir: "{{ ansible_user_dir }}/.local/share/chezmoi"
+
+  tasks:
+    - name: Create .ssh directory
+      ansible.builtin.file:
+        dest: "{{ ssh_dir }}/"
+        mode: "0700"
+        state: directory
+
+    - name: Install private ssh key
+      ansible.builtin.copy:
+        dest: "{{ ssh_dir }}/id_rsa"
+        content: "{{ ssh_private_key }}"
+        mode: "0600"
+
+    - name: Add GitHub to known hosts
+      ansible.builtin.known_hosts:
+        name: github.com
+        key: "{{ lookup('pipe', 'ssh-keyscan github.com') }}"
+
+    - name: Ensure dotfiles dir exists
+      ansible.builtin.file:
+        path: "{{ dotfiles_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Ensure dotfiles are installed
+      ansible.builtin.git:
+        repo: git@github.com:isak102/dotfiles.git
+        dest: "{{ dotfiles_dir }}"
+        version: main
