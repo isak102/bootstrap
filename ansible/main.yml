@@ -38,3 +38,4 @@
         repo: git@github.com:isak102/dotfiles.git
         dest: "{{ dotfiles_dir }}"
         version: main
+      failed_when: false
