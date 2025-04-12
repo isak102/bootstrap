@@ -1,5 +1,5 @@
 ---
-- name: Install ssh key
+- name: Playbook which installs my SSH key and installs my dotfiles directory
   hosts: localhost
 
   vars_files:
